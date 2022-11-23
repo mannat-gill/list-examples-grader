@@ -44,7 +44,6 @@ TAILOUT=$(tail -n 1 /Users/mannat/Documents/GitHub/list-examples-grader/student-
 
 if [[ "$TAILOUT" == *"$PASSED"* ]]; then
   ((score = score + 50 ))
-  message+=" FINAL SCORE IS: "$score"%"
 fi
 
 #if it has failing test we will extract the number of failed tests 
