@@ -56,7 +56,7 @@ FailedTEST=$((SUBSTR))
 #Point where at least getting JUnit tests to run 
 for (( i=0 ; i<$FailedTEST ; i++ )); 
 do 
-    ((score = score + 30 ))
+    ((score = score + 20 ))
     #echo $i
 done
 
