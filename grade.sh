@@ -1,70 +1,70 @@
-# Create your grading script here
-#stop the second there is one error
 set -e 
 CP=".:lib/hamcrest-core-1.3.jar:lib/junit-4.13.2.jar"
-score=100
-echo $score
+score=0
+PASSED="OK"
+FAILED="Failures"
+message=""
 
 rm -rf student-submission
 git clone $1 student-submission 2> clone.txt 
 cd student-submission/
-echo "In student-submission dir"
 
-
-
-#check if the file has the correct name
-#-f: uses find to check 
-#-e: checks if it exists 
-
-#checking if the file exists. WORKS !
+#checking if the file exists. If file exists then 10 points else 0 points 
 if ! [[ -f "ListExamples.java" ]] ; then 
-    ((score = score - 10 )) 
-    echo $score 
-    echo "The File Does not exist"
+    message+="Could not find ListExample.java."
 else 
-    echo $score 
-    echo "File found"
+    ((score = score + 10 )) 
+    message+="ListExamples.java file found. Great Job!"
 fi
 
-echo "Made it here"
 # going into my doc and copying over TestListExamples.java 
 cd /Users/mannat/Documents/GitHub/list-examples-grader/
 cp TestListExamples.java student-submission 
+cp -r lib student-submission
 
-cd /Users/mannat/Documents/GitHub/lab3
-cp ListTests.java student-submission
+cd /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/
 
-if ! [[ -f "TestListExamples.java" ]] ; then 
-    ((score = score - 10 )) 
-    echo $score
-    echo "TestListExamples.java does not exist in this directory"
-else
-    echo $score
-    echo "Found TestListExamples.java"
-    
-fi
-
-
-echo "Before Javac"
-#turn off set -e to print out all errors 
 set +e
 
-#testing file if it exists 
-javac -cp .:lib/hamcrest-core-1.3.jar:lib/junit-4.13.2.jar *.java
-java -cp .:lib/hamcrest-core-1.3.jar:lib/junit-4.13.2.jar org.junit.runner.JUnitCore TestListExamples
-
-#javac -cp $CP *.java > javacTest_output.txt 2> javacTest_errorOutput.java
-#java -cp $CP org.junit.runner.JUnitCore TestListExamples > javaTest_output.txt 2> javaTest_errorOutput.java
-
+#JUnit tests
+javac -cp $CP *.java > javacTest.txt 2> javacError.txt
+java -cp $CP org.junit.runner.JUnitCore TestListExamples > javaTest.txt 2> javaError.txt
+#successful running tests automatically get 40 points for 50% total 
 if [ $? -eq 0 ] ; then 
-    echo $score
-    echo "Successful"
+    ((score = score + 40 )) 
+    message+=" You passed all JUnit tests!"
 else 
-    ((score = score - 50 )) 
-    echo $score
-    echo "Not successful"
+    message+=" Some JUnit tests didn't pass :(. But no worries great job trying!"
 fi
 
-echo "After Javac"
+grep . /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/javaTest.txt > grepOut.txt
 
 
+TAILOUT=$(tail -n 1 /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/grepOut.txt) 
+
+if [[ "$TAILOUT" == *"$PASSED"* ]]; then
+  ((score = score + 50 ))
+  message+=" FINAL SCORE IS: "$score"%"
+fi
+
+#if it has failing test we will extract the number of failed tests 
+if [[ "$TAILOUT" == *"$FAILED"* ]]; then
+  SUBSTR=$(echo $TAILOUT | cut -d' ' -f 5)
+fi
+
+FailedTEST=$((SUBSTR))
+
+#Point where at least getting JUnit tests to run 
+for (( i=0 ; i<$FailedTEST ; i++ )); 
+do 
+    ((score = score + 30 ))
+    #echo $i
+done
+
+#if any tests failed then add to message feedback 
+if [ $FailedTEST -gt 0 ]; then
+    message+=" There were "$FailedTEST" failed tests."
+fi
+
+echo $message
+echo "FINAL SCORE IS: "$score"%"
