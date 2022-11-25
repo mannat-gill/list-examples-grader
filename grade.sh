@@ -27,8 +27,8 @@ cd /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/
 set +e
 
 #JUnit tests
-javac -cp $CP *.java > javacTest.txt 2> javacError.txt
-java -cp $CP org.junit.runner.JUnitCore TestListExamples > javaTest.txt 2> javaError.txt
+javac -cp $CP *.java 
+java -cp $CP org.junit.runner.JUnitCore TestListExamples > javaTest.txt
 #successful running tests automatically get 40 points for 50% total 
 if [ $? -eq 0 ] ; then 
     ((score = score + 40 )) 
@@ -43,12 +43,12 @@ grep . /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/ja
 TAILOUT=$(tail -n 1 /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/grepOut.txt) 
 
 if [[ "$TAILOUT" == *"$PASSED"* ]]; then
-  ((score = score + 50 ))
+((score = score + 50 ))
 fi
 
 #if it has failing test we will extract the number of failed tests 
 if [[ "$TAILOUT" == *"$FAILED"* ]]; then
-  SUBSTR=$(echo $TAILOUT | cut -d' ' -f 5)
+SUBSTR=$(echo $TAILOUT | cut -d' ' -f 5)
 fi
 
 FailedTEST=$((SUBSTR))
