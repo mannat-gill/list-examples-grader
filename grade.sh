@@ -27,7 +27,7 @@ cd /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/
 set +e
 
 #JUnit tests
-javac -cp $CP *.java 
+javac -cp $CP *.java 2> javacTest.txt
 java -cp $CP org.junit.runner.JUnitCore TestListExamples > javaTest.txt
 #successful running tests automatically get 40 points for 50% total 
 if [ $? -eq 0 ] ; then 
@@ -37,10 +37,9 @@ else
     message+=" Some JUnit tests didn't pass :(. But no worries great job trying!"
 fi
 
-grep . /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/javaTest.txt > grepOut.txt
+grep . /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/javaTest.txt > grepOutput.txt
 
-
-TAILOUT=$(tail -n 1 /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/grepOut.txt) 
+TAILOUT=$(tail -n 1 /Users/mannat/Documents/GitHub/list-examples-grader/student-submission/grepOutput.txt) 
 
 if [[ "$TAILOUT" == *"$PASSED"* ]]; then
 ((score = score + 50 ))
